@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  users:
+    build:
+      context: users-service/UsersService
+      dockerfile: Dockerfile
+    container_name: users
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:5001
+      JwtKey: "THIS_IS_A_SUPER_LONG_SECRET_KEY_AT_LEAST_32_CHARS"
+    ports:
+      - "5001:5001"
+    networks:
+      - appnet
+    volumes:
+      - users_db:/app/users.db
+
+  items:
+    build:
+      context: items-service/ItemsService
+      dockerfile: Dockerfile
+    container_name: items
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:5002
+      JwtKey: "THIS_IS_A_SUPER_LONG_SECRET_KEY_AT_LEAST_32_CHARS"
+    ports:
+      - "5002:5002"
+    networks:
+      - appnet
+    depends_on:
+      - users
+    volumes:
+      - items_db:/app/items.db
+
+  sales:
+    build:
+      context: sales-service/SalesService
+      dockerfile: Dockerfile
+    container_name: sales
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:5003
+      JwtKey: "THIS_IS_A_SUPER_LONG_SECRET_KEY_AT_LEAST_32_CHARS"
+      ItemsServiceUrl: "http://items:5002/"
+      UsersServiceUrl: "http://users:5001/"
+      AllowedOrigin: "http://web:4173"
+    ports:
+      - "5003:5003"
+    networks:
+      - appnet
+    depends_on:
+      - items
+      - users
+    volumes:
+      - sales_db:/app/sales.db
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: web
+    environment:
+      VITE_SALES_API_URL: "http://sales:5003/api"
+      VITE_ITEMS_API_URL: "http://items:5002/api"
+      VITE_USERS_API_URL: "http://users:5001/api"
+    ports:
+      - "5173:4173"
+    networks:
+      - appnet
+    depends_on:
+      - sales
+      - items
+      - users
+
+networks:
+  appnet:
+
+volumes:
+  users_db:
+  items_db:
+  sales_db:

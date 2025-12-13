@@ -1,0 +1,201 @@
+/* General layout */
+.employee-dashboard {
+  padding: 20px;
+  background: #f0f2f5;
+  min-height: 100vh;
+  font-family: "Roboto", sans-serif;
+}
+
+.employee-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.employee-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.logout-btn {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.logout-btn:hover {
+  background: #b52a37;
+}
+
+/* Product list section */
+.product-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  margin-bottom: 24px;
+}
+
+.product-section h3 {
+  margin-top: 0;
+  color: #007bff;
+}
+
+.product-table-container {
+  max-height: 250px; /* fixed height */
+  overflow-y: auto;  /* scroll bar */
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+}
+
+.product-table {
+  width: 100%;
+  min-width: 600px; /* fixed width for consistency */
+  border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.product-table th {
+  background: #007bff;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Sale section */
+.sale-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.sale-section h3 {
+  margin-top: 0;
+  color: #007bff;
+}
+
+.info-msg {
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: #28a745;
+}
+
+/* Sale form */
+.sale-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sale-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #333;
+}
+
+.sale-form input[type="text"],
+.sale-form input[type="number"] {
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #cfd4dc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.sale-form input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Sale items list */
+.sale-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sale-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sale-row input[type="text"],
+.sale-row input[type="number"] {
+  padding: 8px;
+  border: 1px solid #cfd4dc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.subtotal {
+  min-width: 120px;
+  text-align: right;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Add product button */
+.add-item-btn {
+  background: #17a2b8;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.add-item-btn:hover {
+  background: #117a8b;
+}
+
+/* Total row */
+.total-row {
+  text-align: right;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Complete sale button */
+.complete-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+.complete-btn:hover {
+  background: #0056b3;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .product-table {
+    min-width: 100%;
+  }
+
+  .sale-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .subtotal {
+    text-align: left;
+  }
+}
