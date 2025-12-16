@@ -1,6 +1,6 @@
 import { getToken } from "./auth";
 
-const BASE_URL = import.meta.env.VITE_SALES_API_URL;
+const BASE_URL = import.meta.env.VITE_SALES_API_URL || "http://localhost:5003/api";
 
 export const createSale = async (sale) => {
   const token = getToken();
@@ -16,7 +16,7 @@ export const createSale = async (sale) => {
 
   console.log("Payload sent to backend:", payload);
 
-  const res = await fetch(BASE_URL, {
+  const res = await fetch(`${BASE_URL}/sales`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const getSales = async () => {
   const token = getToken();
   if (!token) throw new Error("You must be logged in to view sales.");
 
-  const res = await fetch(BASE_URL, {
+  const res = await fetch(`${BASE_URL}/sales`, {
     headers: { Authorization: `Bearer ${token}` }
   });
 

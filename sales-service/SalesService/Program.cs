@@ -31,7 +31,7 @@ builder.Services.AddCors(options =>
         policy.AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
-              .WithOrigins("http://localhost:5173"); // React dev server
+              .WithOrigins("http://localhost:5173", "http://web:4173"); // React dev server and docker web
     });
 });
 

@@ -1,7 +1,9 @@
 // src/services/auth.js
 
+const USERS_BASE = import.meta.env.VITE_USERS_API_URL || "http://localhost:5001/api";
+
 export const login = async (username, password) => {
-  const res = await fetch("http://localhost:5284/api/users/login", {
+  const res = await fetch(`${USERS_BASE}/users/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
