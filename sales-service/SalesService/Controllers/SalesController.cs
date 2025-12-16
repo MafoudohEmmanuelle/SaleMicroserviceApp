@@ -36,6 +36,12 @@ namespace SalesService.Controllers
             var userId = int.Parse(userIdClaim);
             var userName = User.Identity?.Name ?? "Unknown";
 
+            // Extract bearer token from incoming request so we can forward it to ItemsService
+            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+            string? bearer = null;
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                bearer = authHeader.Substring("Bearer ".Length);
+
             var sale = new Sale
             {
                 CustomerName = dto.CustomerName,
@@ -48,7 +54,7 @@ namespace SalesService.Controllers
 
             foreach (var item in dto.Items)
             {
-                var product = await _products.GetProduct(item.ProductId);
+                var product = await _products.GetProduct(item.ProductId, bearer);
                 if (product == null)
                     return BadRequest($"Product {item.ProductId} not found in ItemsService!");
 
@@ -73,7 +79,7 @@ namespace SalesService.Controllers
                 Quantity = i.Quantity
             }).ToList();
 
-            var stockUpdated = await _products.DecrementStock(stockUpdate);
+            var stockUpdated = await _products.DecrementStock(stockUpdate, bearer);
             if (!stockUpdated)
                 return BadRequest("Failed to update stock. Please check product quantities.");
 

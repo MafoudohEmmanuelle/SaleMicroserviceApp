@@ -12,11 +12,15 @@ namespace SalesService.Clients
             _http = httpClient;
         }
 
-        public async Task<ProductDto?> GetProduct(int id)
+        public async Task<ProductDto?> GetProduct(int id, string? bearerToken = null)
         {
             try
             {
-                var res = await _http.GetAsync($"api/products/{id}");
+                var request = new HttpRequestMessage(HttpMethod.Get, $"api/products/{id}");
+                if (!string.IsNullOrEmpty(bearerToken))
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+
+                var res = await _http.SendAsync(request);
                 if (!res.IsSuccessStatusCode) return null;
 
                 return await res.Content.ReadFromJsonAsync<ProductDto>();
@@ -27,11 +31,18 @@ namespace SalesService.Clients
             }
         }
 
-        public async Task<bool> DecrementStock(List<DecrementStockDto> items)
+        public async Task<bool> DecrementStock(List<DecrementStockDto> items, string? bearerToken = null)
         {
             try
             {
-                var res = await _http.PatchAsJsonAsync("api/products/decrement-stock", items);
+                var request = new HttpRequestMessage(new HttpMethod("PATCH"), "api/products/decrement-stock")
+                {
+                    Content = JsonContent.Create(items)
+                };
+                if (!string.IsNullOrEmpty(bearerToken))
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+
+                var res = await _http.SendAsync(request);
                 return res.IsSuccessStatusCode;
             }
             catch
