@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -13,46 +12,32 @@ namespace SalesService.Clients
             _http = httpClient;
         }
 
-        // GET /api/products/{id} from ItemsService with token forwarding
-        public async Task<ProductDto?> GetProduct(int id, string token)
+        public async Task<ProductDto?> GetProduct(int id)
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, $"api/products/{id}");
-                if (!string.IsNullOrEmpty(token))
-                {
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                }
-
-                var res = await _http.SendAsync(request);
-                if (!res.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"ProductClient GET failed: {res.StatusCode}");
-                    return null;
-                }
+                var res = await _http.GetAsync($"api/products/{id}");
+                if (!res.IsSuccessStatusCode) return null;
 
                 return await res.Content.ReadFromJsonAsync<ProductDto>();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"ProductClient exception: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<bool> DecrementStock(int productId, int quantity, string token)
+        public async Task<bool> DecrementStock(List<DecrementStockDto> items)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "api/products/decrement");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            request.Content = JsonContent.Create(new
+            try
             {
-                ProductId = productId,
-                Quantity = quantity
-            });
-
-            var res = await _http.SendAsync(request);
-            return res.IsSuccessStatusCode;
+                var res = await _http.PatchAsJsonAsync("api/products/decrement-stock", items);
+                return res.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 
@@ -61,5 +46,11 @@ namespace SalesService.Clients
         public int Id { get; set; }
         public string? Name { get; set; }
         public decimal Price { get; set; }
+    }
+
+    public class DecrementStockDto
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

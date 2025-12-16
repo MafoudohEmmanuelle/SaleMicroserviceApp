@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // JWT auth
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
-builder.Services.addAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters

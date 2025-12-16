@@ -9,7 +9,7 @@ namespace ItemsService.Controllers
 {
     [ApiController]
     [Route("api/products")]
-    [Authorize] // all endpoints require login by default
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -19,7 +19,7 @@ namespace ItemsService.Controllers
             _context = context;
         }
 
-        // GET all products (all authorized users)
+        // GET all products
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -27,7 +27,17 @@ namespace ItemsService.Controllers
             return Ok(products);
         }
 
-        // POST create new product (only Admin)
+        // GET by id
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return NotFound("Product not found");
+            return Ok(product);
+        }
+
+        // POST create product
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CreateProductDto dto)
@@ -46,7 +56,7 @@ namespace ItemsService.Controllers
             return Ok(product);
         }
 
-        // PUT update product (only Admin)
+        // PUT update product
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, UpdateProductDto dto)
@@ -68,18 +78,7 @@ namespace ItemsService.Controllers
             return Ok(product);
         }
 
-        // ✅ Allow anonymous access for SalesService lookups
-        [HttpGet("{id}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-                return NotFound("Product not found");
-            return Ok(product);
-        }
-
-        // DELETE product (only Admin)
+        // DELETE
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
@@ -90,33 +89,34 @@ namespace ItemsService.Controllers
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
-
-            return NoContent(); // 204 response
+            return NoContent();
         }
 
-        // POST api/products/decrement
-        [HttpPost("decrement")]
-        public async Task<IActionResult> DecrementStock(DecrementStockDto dto)
+        // PATCH decrement stock
+        [HttpPatch("decrement-stock")]
+        [Authorize(Roles = "Admin,Employee")]
+        public async Task<IActionResult> DecrementStock([FromBody] List<DecrementStockDto> dtos)
         {
-            var product = await _context.Products.FindAsync(dto.ProductId);
+            foreach (var dto in dtos)
+            {
+                var product = await _context.Products.FindAsync(dto.ProductId);
+                if (product == null)
+                    return NotFound($"Product {dto.ProductId} not found");
 
-            if (product == null)
-                return NotFound($"Product {dto.ProductId} not found");
+                if (product.Quantity < dto.Quantity)
+                    return BadRequest($"Insufficient stock for product {product.Name}");
 
-            if (product.Quantity < dto.Quantity)
-                return BadRequest("Insufficient stock");
-
-            product.Quantity -= dto.Quantity;
+                product.Quantity -= dto.Quantity;
+            }
 
             await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                product.Id,
-                product.Name,
-                product.Quantity
-            });
+            return Ok();
         }
+    }
 
+    public class DecrementStockDto
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

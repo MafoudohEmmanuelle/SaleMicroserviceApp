@@ -27,7 +27,7 @@ namespace SalesService.Controllers
         public async Task<IActionResult> CreateSale(CreateSaleDto dto)
         {
             if (dto == null || dto.Items == null || !dto.Items.Any())
-                return BadRequest("Sale must contain at least one item.");
+                return BadRequest("La vente doit contenir au moins un item.");
 
             var userIdClaim = User.FindFirst("id")?.Value;
             if (string.IsNullOrEmpty(userIdClaim))
@@ -35,9 +35,6 @@ namespace SalesService.Controllers
 
             var userId = int.Parse(userIdClaim);
             var userName = User.Identity?.Name ?? "Unknown";
-
-            // Extract the JWT
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
             var sale = new Sale
             {
@@ -51,14 +48,9 @@ namespace SalesService.Controllers
 
             foreach (var item in dto.Items)
             {
-                var product = await _products.GetProduct(item.ProductId, token);
+                var product = await _products.GetProduct(item.ProductId);
                 if (product == null)
                     return BadRequest($"Product {item.ProductId} not found in ItemsService!");
-
-                // Decrement stock
-                var stockUpdated = await _products.DecrementStock(item.ProductId, item.Quantity, token);
-                if (!stockUpdated)
-                    return BadRequest($"Insufficient stock for product ID {item.ProductId}");
 
                 var saleItem = new SaleItem
                 {
@@ -68,14 +60,22 @@ namespace SalesService.Controllers
                     UnitPrice = product.Price
                 };
 
-                // FIX #1: Add item to sale
                 sale.Items.Add(saleItem);
-
-                // FIX #2: Update total price
                 total += saleItem.UnitPrice * saleItem.Quantity;
             }
 
             sale.TotalAmount = total;
+
+            // Décrémenter les stocks dans ItemsService
+            var stockUpdate = sale.Items.Select(i => new DecrementStockDto
+            {
+                ProductId = i.ProductId,
+                Quantity = i.Quantity
+            }).ToList();
+
+            var stockUpdated = await _products.DecrementStock(stockUpdate);
+            if (!stockUpdated)
+                return BadRequest("Failed to update stock. Please check product quantities.");
 
             _context.Sales.Add(sale);
             await _context.SaveChangesAsync();
