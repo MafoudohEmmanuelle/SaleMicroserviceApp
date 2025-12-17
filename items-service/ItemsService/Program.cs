@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 
 // FIX: Docker-safe SQLite path
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=/app/items.db"));
+    options.UseSqlite("Data Source=/data/items.db"));
 
 // JWT auth
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
@@ -53,7 +53,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated(); // Safe for SQLite in Docker
+    db.Database.Migrate();
 }
 
 app.UseSwagger();

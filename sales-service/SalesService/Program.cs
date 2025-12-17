@@ -15,9 +15,9 @@ if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 32)
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=sales.db"));
+    options.UseSqlite("Data Source=/data/sales.db"));
 
-// Register ProductClient with correct base address
+// Register ProductClient with correct base addressv
 builder.Services.AddHttpClient<ProductClient>(client =>
 {
     client.BaseAddress = new Uri(itemsServiceUrl);

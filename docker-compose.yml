@@ -15,7 +15,7 @@ services:
     networks:
       - appnet
     volumes:
-      - users_db:/app/users.db
+      - users_db:/data/users.db
 
   items:
     build:
@@ -62,14 +62,14 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_SALES_API_URL: "http://sales:5003/api"
-        VITE_ITEMS_API_URL: "http://items:5002/api"
-        VITE_USERS_API_URL: "http://users:5001/api"
+        VITE_SALES_API_URL: "http://localhost:5003/api"
+        VITE_ITEMS_API_URL: "http://localhost:5002/api"
+        VITE_USERS_API_URL: "http://localhost:5001/api"
     container_name: web
     environment:
-      VITE_SALES_API_URL: "http://sales:5003/api"
-      VITE_ITEMS_API_URL: "http://items:5002/api"
-      VITE_USERS_API_URL: "http://users:5001/api"
+      VITE_SALES_API_URL: "http://localhost:5003/api"
+      VITE_ITEMS_API_URL: "http://localhost:5002/api"
+      VITE_USERS_API_URL: "http://localhost:5001/api"
     ports:
       - "5173:4173"
     networks:
