@@ -17,10 +17,12 @@ namespace UserService.Controllers
     {
         private readonly AppDbContext _context;
         private readonly string _jwtKey;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(AppDbContext context, IConfiguration configuration)
+        public UsersController(AppDbContext context, IConfiguration configuration, ILogger<UsersController> logger)
         {
             _context = context;
+            _logger = logger;
             _jwtKey = configuration["JwtKey"] ?? throw new Exception("JWT Key not found in config");
         }
 
@@ -52,9 +54,16 @@ namespace UserService.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            _logger.LogInformation("Login attempt for {Username}", dto.Username);
+
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                _logger.LogWarning("Invalid login attempt for {Username}", dto.Username);
                 return Unauthorized(new { message = "Invalid credentials" });
+            }
+
+            _logger.LogInformation("User {Username} authenticated successfully", dto.Username);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_jwtKey);

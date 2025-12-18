@@ -9,6 +9,8 @@ RUN dotnet publish -c Release -o /app
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app .
+# Ensure writable data directory for SQLite
+RUN mkdir -p /app/data && chmod -R 777 /app/data
 # Environment for ASP.NET Core
 ENV ASPNETCORE_URLS=http://0.0.0.0:5001
 EXPOSE 5001

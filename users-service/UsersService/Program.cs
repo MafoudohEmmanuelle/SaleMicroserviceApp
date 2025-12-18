@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserService.Data;
+using UserService.Models;
 using System.Security.Claims;
 
 
@@ -24,7 +25,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=/data/users.db"));
+    options.UseSqlite("Data Source=/app/data/users.db"));
 
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -53,6 +54,22 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
+
+    // Seed an admin user by default if no users exist. Credentials are taken from env vars if provided.
+    if (!db.Users.Any())
+    {
+        var adminUsername = builder.Configuration["AdminUsername"] ?? "admin";
+        var adminPassword = builder.Configuration["AdminPassword"] ?? "admin123";
+        var admin = new User
+        {
+            Username = adminUsername,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+            Role = UserRole.Admin
+        };
+        db.Users.Add(admin);
+        db.SaveChanges();
+        Console.WriteLine($"Seeded admin user: {adminUsername}");
+    }
 }
 
 app.UseSwagger();

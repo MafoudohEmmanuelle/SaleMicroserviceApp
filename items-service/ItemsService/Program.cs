@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 
 // FIX: Docker-safe SQLite path
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=/data/items.db"));
+    options.UseSqlite("Data Source=/app/data/items.db"));
 
 // JWT auth
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);

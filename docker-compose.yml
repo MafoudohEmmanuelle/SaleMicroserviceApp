@@ -15,7 +15,7 @@ services:
     networks:
       - appnet
     volumes:
-      - users_db:/data/users.db
+      - users_db:/app/data
 
   items:
     build:
@@ -33,7 +33,7 @@ services:
     depends_on:
       - users
     volumes:
-      - items_db:/app/items.db
+      - items_db:/app/data
 
   sales:
     build:
@@ -55,7 +55,7 @@ services:
       - items
       - users
     volumes:
-      - sales_db:/app/sales.db
+      - sales_db:/app/data
 
   web:
     build:
