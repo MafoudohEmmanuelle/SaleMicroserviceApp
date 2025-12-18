@@ -57,7 +57,9 @@ namespace UserService.Controllers
             _logger.LogInformation("Login attempt for {Username}", dto.Username);
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            var passwordValid = user != null && BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+            _logger.LogInformation("Password verification for {Username}: {Result}", dto.Username, passwordValid);
+            if (user == null || !passwordValid)
             {
                 _logger.LogWarning("Invalid login attempt for {Username}", dto.Username);
                 return Unauthorized(new { message = "Invalid credentials" });

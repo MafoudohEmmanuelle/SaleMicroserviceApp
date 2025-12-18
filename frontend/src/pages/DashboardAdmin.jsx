@@ -396,6 +396,88 @@ export default function DashboardAdmin() {
           </table>
         </div>
       </section>
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div className="modal" onClick={() => setEditingUser(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Edit User</h3>
+            <form className="modal-form" onSubmit={handleSaveUser}>
+              <label>Username</label>
+              <input
+                value={editingUser.username}
+                onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value })}
+                required
+              />
+
+              <label>Role</label>
+              <select
+                value={editingUser.role}
+                onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+              >
+                <option value="Admin">Admin</option>
+                <option value="Employee">Employee</option>
+              </select>
+
+              <div className="modal-actions">
+                <button type="submit">Save</button>
+                <button type="button" onClick={() => setEditingUser(null)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Product Modal */}
+      {editingProduct && (
+        <div className="modal" onClick={() => setEditingProduct(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Edit Product</h3>
+            <form className="modal-form" onSubmit={handleSaveProduct}>
+              <label>Name</label>
+              <input
+                value={editingProduct.name}
+                onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                required
+              />
+
+              <label>Description</label>
+              <input
+                value={editingProduct.description}
+                onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                required
+              />
+
+              <label>Price</label>
+              <input
+                type="number"
+                step="0.01"
+                value={editingProduct.price}
+                onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })}
+                required
+              />
+
+              <label>Quantity</label>
+              <input
+                type="number"
+                value={editingProduct.quantity}
+                onChange={(e) => setEditingProduct({ ...editingProduct, quantity: e.target.value })}
+                required
+              />
+
+              <div className="modal-actions">
+                <button type="submit">Save</button>
+                <button type="button" onClick={() => setEditingProduct(null)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -10,6 +10,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:5001
       JwtKey: "THIS_IS_A_SUPER_LONG_SECRET_KEY_AT_LEAST_32_CHARS"
+      AdminPassword: "password123"
     ports:
       - "5001:5001"
     networks:

@@ -70,6 +70,20 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
         Console.WriteLine($"Seeded admin user: {adminUsername}");
     }
+
+    // If AdminPassword env var is set, ensure existing admin's password is updated to the hashed value.
+    var configuredAdminPassword = builder.Configuration["AdminPassword"];
+    var configuredAdminUsername = builder.Configuration["AdminUsername"] ?? "admin";
+    if (!string.IsNullOrEmpty(configuredAdminPassword))
+    {
+        var existingAdmin = db.Users.FirstOrDefault(u => u.Username == configuredAdminUsername);
+        if (existingAdmin != null)
+        {
+            existingAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(configuredAdminPassword);
+            db.SaveChanges();
+            Console.WriteLine($"Updated admin password from env for {configuredAdminUsername}");
+        }
+    }
 }
 
 app.UseSwagger();
