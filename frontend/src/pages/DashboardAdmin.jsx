@@ -47,10 +47,27 @@ export default function DashboardAdmin() {
   const fetchData = async () => {
     try {
       const usersData = await getAllUsers();
-      setUsers(Array.isArray(usersData) ? usersData : []);
+      // Normalize keys to camelCase to avoid casing differences from backend
+      const normalizedUsers = Array.isArray(usersData)
+        ? usersData.map((u) => ({
+            id: u.id ?? u.Id,
+            username: u.username ?? u.Username,
+            role: (u.role ?? u.Role)?.toString(),
+          }))
+        : [];
+      setUsers(normalizedUsers);
 
       const productsData = await getAllProducts();
-      setProducts(Array.isArray(productsData) ? productsData : []);
+      const normalizedProducts = Array.isArray(productsData)
+        ? productsData.map((p) => ({
+            id: p.id ?? p.Id,
+            name: p.name ?? p.Name,
+            description: p.description ?? p.Description,
+            price: p.price ?? p.Price,
+            quantity: p.quantity ?? p.Quantity,
+          }))
+        : [];
+      setProducts(normalizedProducts);
 
       const salesData = await getSales();
       setSales(Array.isArray(salesData) ? salesData : []);
@@ -62,6 +79,15 @@ export default function DashboardAdmin() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Debug: log when edit states change
+  useEffect(() => {
+    console.log('editingUser changed:', editingUser);
+  }, [editingUser]);
+
+  useEffect(() => {
+    console.log('editingProduct changed:', editingProduct);
+  }, [editingProduct]);
 
   // Add user
   const handleAddUser = async (e) => {
